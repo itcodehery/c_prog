@@ -1,0 +1,11 @@
+// medical_constants.h
+#ifndef MEDICAL_CONSTANTS_H
+#define MEDICAL_CONSTANTS_H
+
+#define NORMAL_TEMP_MAX 98.6
+#define FEVER_TEMP_MIN 99.0
+#define MAX_PATIENTS 10
+#define BP_NORMAL_SYSTOLIC_MAX 119
+#define BP_NORMAL_DIASTOLIC_MAX 79
+
+#endif // MEDICAL_CONSTANTS_H   
