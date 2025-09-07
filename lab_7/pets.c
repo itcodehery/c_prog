@@ -50,7 +50,7 @@ struct Pet findLowestFeePet(struct Pet p[], int n) {
     return lowest;
 }
 
-void main() {
+int main() {
     int n;
     struct Pet p[100];
     printf("Pet Adoption Center:");
@@ -94,4 +94,7 @@ void main() {
     struct Pet lowest = findLowestFeePet(p, n);
     printf("Lowest fee pet: %s\n", lowest.name);
     printf("Lowest fee: %.2f\n", lowest.adoption_fee);
+
+
+    return 0;
 }

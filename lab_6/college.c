@@ -1,5 +1,6 @@
+#include <malloc.h>
 #include<stdio.h>
-#include<stdlib.h>
+#include<stdio.h>
 
 void inputMarks(int *marks, int n) {
     for (int i = 0; i < n ; i++) {
@@ -34,7 +35,7 @@ float findAverage(int *marks, int n) {
     return average;
 }
 
-void main() {
+int main() {
     int studentNum, *arr;
     printf("\nEnter the number of students: ");
     scanf("%d", &studentNum);
@@ -53,4 +54,5 @@ void main() {
     // Memory deallocation
     free(arr);
     printf("Memory successfully deallocated!");
+    return 0;
 }
