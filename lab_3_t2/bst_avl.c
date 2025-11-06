@@ -46,7 +46,13 @@ AVLNode *createAVLNode(Artist artist) {
   return newNode;
 }
 
-int max(int a, int b) { return (a > b) ? a : b; }
+int max_val(int a, int b) {
+  if (a > b) {
+    return a;
+  } else {
+    return b;
+  }
+}
 
 int height(AVLNode *N) {
   if (N == NULL)
@@ -106,7 +112,7 @@ BSTNode *deleteBST(BSTNode *root, int age) {
 
 void updateHeight(AVLNode *node) {
   if (node) {
-    node->height = 1 + max(height(node->left), height(node->right));
+    node->height = 1 + max_val(height(node->left), height(node->right));
   }
 }
 
@@ -477,8 +483,61 @@ void buildAVLLoop() {
 }
 
 void buildComparison() {
-  printf("Nothing to compare yet!\n");
-  return;
+  int n;
+  printf("Enter number of elements to insert: ");
+  scanf("%d", &n);
+
+  if (n <= 0) {
+    printf("Invalid number of elements.\n");
+    return;
+  }
+
+  int *ages = (int *)malloc(n * sizeof(int));
+  if (ages == NULL) {
+    printf("Memory allocation failed.\n");
+    return;
+  }
+
+  printf("Enter %d age values:\n", n);
+  for (int i = 0; i < n; i++) {
+    scanf("%d", &ages[i]);
+  }
+
+  BSTNode *bstRoot = NULL;
+  int bstComparisons = 0;
+  printf("\nBuilding BST...\n");
+  for (int i = 0; i < n; i++) {
+    bstRoot = insertBST(bstRoot, ages[i]);
+  }
+
+  AVLNode *avlRoot = NULL;
+  printf("Building AVL...\n");
+  for (int i = 0; i < n; i++) {
+    Artist temp;
+    printf(temp.name, "%d", ages[i]);
+    strcpy(temp.genre, "N/A");
+    avlRoot = insertAVL(avlRoot, temp);
+  }
+
+  int bstHeight = 0;
+  BSTNode *curr = bstRoot;
+  while (curr != NULL) {
+    bstHeight++;
+    curr = curr->right;
+  }
+
+  int avlHeight = height(avlRoot);
+
+  printf("\n--------------------------\n");
+  printf("Comparison Results\n");
+  printf("--------------------------\n");
+  printf("Number of elements: %d\n", n);
+  printf("BST Height: %d\n", bstHeight);
+  printf("AVL Height: %d\n", avlHeight);
+  printf("\nBST is %s balanced than AVL.\n",
+         bstHeight > avlHeight ? "less" : "equally");
+
+  free(ages);
 }
 
 int main() {
