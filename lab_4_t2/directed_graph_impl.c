@@ -24,7 +24,6 @@ typedef struct {
   int top;
 } Stack;
 
-// Queue operations
 void initQueue(Queue *q) {
   q->front = -1;
   q->rear = -1;
@@ -48,7 +47,6 @@ int dequeue(Queue *q) {
   return item;
 }
 
-// Stack operations
 void initStack(Stack *s) { s->top = -1; }
 
 bool isStackEmpty(Stack *s) { return s->top == -1; }
@@ -57,7 +55,6 @@ void push(Stack *s, int value) { s->items[++(s->top)] = value; }
 
 int pop(Stack *s) { return s->items[(s->top)--]; }
 
-// Initialize graph
 void initGraph(Graph *g) {
   g->vertices = 0;
   for (int i = 0; i < MAX_VERTICES; i++) {
@@ -65,7 +62,6 @@ void initGraph(Graph *g) {
   }
 }
 
-// Add edge to adjacency list
 void addEdge(Graph *g, int src, int dest) {
   Node *newNode = (Node *)malloc(sizeof(Node));
   newNode->vertex = dest;
@@ -73,7 +69,6 @@ void addEdge(Graph *g, int src, int dest) {
   g->adj[src] = newNode;
 }
 
-// Free adjacency list
 void freeGraph(Graph *g) {
   for (int i = 0; i < g->vertices; i++) {
     Node *temp = g->adj[i];
@@ -85,11 +80,9 @@ void freeGraph(Graph *g) {
   }
 }
 
-// Create graph
 void createGraph(Graph *g) {
   int edges, src, dest;
 
-  // Free existing graph
   freeGraph(g);
 
   printf("\nEnter number of vertices: ");
@@ -101,7 +94,6 @@ void createGraph(Graph *g) {
     return;
   }
 
-  // Initialize adjacency list
   for (int i = 0; i < g->vertices; i++) {
     g->adj[i] = NULL;
   }
@@ -125,7 +117,6 @@ void createGraph(Graph *g) {
   printf("\nGraph created successfully!\n");
 }
 
-// Display adjacency list
 void displayGraph(Graph *g) {
   if (g->vertices == 0) {
     printf("\nGraph is empty!\n");
@@ -144,7 +135,6 @@ void displayGraph(Graph *g) {
   }
 }
 
-// BFS Traversal
 void BFT(Graph *g, int start) {
   if (g->vertices == 0) {
     printf("\nGraph is empty!\n");
@@ -176,7 +166,6 @@ void BFT(Graph *g, int start) {
   printf("\n");
 }
 
-// DFS Traversal (Recursive helper)
 void DFTUtil(Graph *g, int vertex, bool visited[]) {
   visited[vertex] = true;
   printf("%d ", vertex);
@@ -190,7 +179,6 @@ void DFTUtil(Graph *g, int vertex, bool visited[]) {
   }
 }
 
-// DFS Traversal
 void DFT(Graph *g, int start) {
   if (g->vertices == 0) {
     printf("\nGraph is empty!\n");
@@ -204,7 +192,6 @@ void DFT(Graph *g, int start) {
   printf("\n");
 }
 
-// Check for cycle using DFS (for DAG check)
 bool isCyclicUtil(Graph *g, int v, bool visited[], bool recStack[]) {
   if (!visited[v]) {
     visited[v] = true;
@@ -225,7 +212,6 @@ bool isCyclicUtil(Graph *g, int v, bool visited[], bool recStack[]) {
   return false;
 }
 
-// Check if graph is DAG (Directed Acyclic Graph)
 bool isDAG(Graph *g) {
   if (g->vertices == 0) {
     printf("\nGraph is empty!\n");
@@ -245,7 +231,6 @@ bool isDAG(Graph *g) {
   return true;
 }
 
-// Topological sort helper using DFS
 void topologicalSortUtil(Graph *g, int v, bool visited[], Stack *s) {
   visited[v] = true;
 
@@ -260,7 +245,6 @@ void topologicalSortUtil(Graph *g, int v, bool visited[], Stack *s) {
   push(s, v);
 }
 
-// Topological sort
 void topologicalSort(Graph *g) {
   if (g->vertices == 0) {
     printf("\nGraph is empty!\n");
@@ -289,7 +273,6 @@ void topologicalSort(Graph *g) {
   printf("\n");
 }
 
-// Traversal menu
 void traversalMenu(Graph *g) {
   int choice, start;
 
