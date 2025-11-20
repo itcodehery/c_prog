@@ -1,0 +1,19 @@
+Dijkstra's Algorithm Complexity in a Music Studio
+
+This document discusses the complexity of Dijkstra's algorithm, using our music studio example to make things clearer. In our C code, we're finding the shortest time to get from one room to another.
+
+*   **V (Vertices)**: Represents the number of rooms in our studio (e.g., Lobby, Recording Room).
+*   **E (Edges)**: Represents the connections or pathways between the rooms.
+
+Time Complexity:
+The time it takes to run the algorithm depends on how we find the next closest room.
+
+1.  **Simple Approach (Using an Array)**: If we just check a list of all rooms to find the next closest one, the time complexity is **O(V^2)**. This is simple to code but can be slow if you have a huge number of rooms. For our small studio, this would be perfectly fine.
+
+2.  **Efficient Approach (Using a Binary Heap)**: Our C code uses a more advanced structure called a binary heap. This is like a smart list that keeps the closest rooms at the top. This makes finding the next room much faster. The time complexity is **O(E log V)**. This is very efficient and scales well even for a large studio with many rooms and connections.
+
+Space Complexity:
+The memory needed is determined by the number of rooms. We need to store the distance to each room and the priority queue of rooms to visit. So, the space complexity is **O(V)**. For each room, we store a bit of information.
+
+Correctness:
+Dijkstra's algorithm will always find the shortest path (fastest route) from a starting room to all other rooms, as long as the time taken to travel between rooms is not negative (which makes sense, as time can't go backward!). It works by always picking the closest room it hasn't visited yet, guaranteeing an optimal solution.
