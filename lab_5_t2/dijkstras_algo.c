@@ -9,7 +9,7 @@ struct AdjListNode {
 };
 
 struct AdjList {
-  struct AdjListNode *head; // pointer to head node of list
+  struct AdjListNode *head;
 };
 
 struct Graph {
@@ -45,107 +45,82 @@ void addEdge(struct Graph *graph, int src, int dest, int weight) {
   graph->array[dest].head = newNode;
 }
 
-struct MinHeapNode {
-  int v;
-  int dist;
+struct PQNode {
+  int vertex;
+  int distance;
 };
 
-struct MinHeap {
+struct PriorityQueue {
+  struct PQNode *nodes;
   int size;
   int capacity;
-  int *pos;
-  struct MinHeapNode **array;
 };
 
-struct MinHeapNode *newMinHeapNode(int v, int dist) {
-  struct MinHeapNode *minHeapNode =
-      (struct MinHeapNode *)malloc(sizeof(struct MinHeapNode));
-  minHeapNode->v = v;
-  minHeapNode->dist = dist;
-  return minHeapNode;
+struct PriorityQueue *createPriorityQueue(int capacity) {
+  struct PriorityQueue *pq =
+      (struct PriorityQueue *)malloc(sizeof(struct PriorityQueue));
+  pq->nodes = (struct PQNode *)malloc(capacity * sizeof(struct PQNode));
+  pq->size = 0;
+  pq->capacity = capacity;
+  return pq;
 }
 
-struct MinHeap *createMinHeap(int capacity) {
-  struct MinHeap *minHeap = (struct MinHeap *)malloc(sizeof(struct MinHeap));
-  minHeap->pos = (int *)malloc(capacity * sizeof(int));
-  minHeap->size = 0;
-  minHeap->capacity = capacity;
-  minHeap->array =
-      (struct MinHeapNode **)malloc(capacity * sizeof(struct MinHeapNode *));
-  return minHeap;
-}
-
-void swapMinHeapNode(struct MinHeapNode **a, struct MinHeapNode **b) {
-  struct MinHeapNode *t = *a;
+void swapNodes(struct PQNode *a, struct PQNode *b) {
+  struct PQNode temp = *a;
   *a = *b;
-  *b = t;
+  *b = temp;
 }
 
-void minHeapify(struct MinHeap *minHeap, int idx) {
-  int smallest, left, right;
-  smallest = idx;
-  left = 2 * idx + 1;
-  right = 2 * idx + 2;
+void heapifyDown(struct PriorityQueue *pq, int idx) {
+  int smallest = idx;
+  int left = 2 * idx + 1;
+  int right = 2 * idx + 2;
 
-  if (left < minHeap->size &&
-      minHeap->array[left]->dist < minHeap->array[smallest]->dist)
+  if (left < pq->size &&
+      pq->nodes[left].distance < pq->nodes[smallest].distance)
     smallest = left;
 
-  if (right < minHeap->size &&
-      minHeap->array[right]->dist < minHeap->array[smallest]->dist)
+  if (right < pq->size &&
+      pq->nodes[right].distance < pq->nodes[smallest].distance)
     smallest = right;
 
   if (smallest != idx) {
-    struct MinHeapNode *smallestNode = minHeap->array[smallest];
-    struct MinHeapNode *idxNode = minHeap->array[idx];
-
-    minHeap->pos[smallestNode->v] = idx;
-    minHeap->pos[idxNode->v] = smallest;
-
-    swapMinHeapNode(&minHeap->array[smallest], &minHeap->array[idx]);
-
-    minHeapify(minHeap, smallest);
+    swapNodes(&pq->nodes[idx], &pq->nodes[smallest]);
+    heapifyDown(pq, smallest);
   }
 }
 
-int isEmpty(struct MinHeap *minHeap) { return minHeap->size == 0; }
+int isEmpty(struct PriorityQueue *pq) { return pq->size == 0; }
 
-struct MinHeapNode *extractMin(struct MinHeap *minHeap) {
-  if (isEmpty(minHeap))
-    return NULL;
+void insert(struct PriorityQueue *pq, int vertex, int distance) {
+  if (pq->size == pq->capacity) {
+    fprintf(stderr, "Priority queue is full!\n");
+    return;
+  }
 
-  struct MinHeapNode *root = minHeap->array[0];
+  int i = pq->size;
+  pq->nodes[i].vertex = vertex;
+  pq->nodes[i].distance = distance;
+  pq->size++;
 
-  struct MinHeapNode *lastNode = minHeap->array[minHeap->size - 1];
-  minHeap->array[0] = lastNode;
-
-  minHeap->pos[root->v] = minHeap->size - 1;
-  minHeap->pos[lastNode->v] = 0;
-
-  --minHeap->size;
-  minHeapify(minHeap, 0);
-
-  return root;
-}
-
-void decreaseKey(struct MinHeap *minHeap, int v, int dist) {
-  int i = minHeap->pos[v];
-
-  minHeap->array[i]->dist = dist;
-
-  while (i && minHeap->array[i]->dist < minHeap->array[(i - 1) / 2]->dist) {
-    minHeap->pos[minHeap->array[i]->v] = (i - 1) / 2;
-    minHeap->pos[minHeap->array[(i - 1) / 2]->v] = i;
-    swapMinHeapNode(&minHeap->array[i], &minHeap->array[(i - 1) / 2]);
-
+  while (i != 0 && pq->nodes[i].distance < pq->nodes[(i - 1) / 2].distance) {
+    swapNodes(&pq->nodes[i], &pq->nodes[(i - 1) / 2]);
     i = (i - 1) / 2;
   }
 }
 
-int isInMinHeap(struct MinHeap *minHeap, int v) {
-  if (minHeap->pos[v] < minHeap->size)
-    return 1;
-  return 0;
+struct PQNode extractMin(struct PriorityQueue *pq) {
+  if (isEmpty(pq)) {
+    struct PQNode emptyNode = {-1, INT_MAX};
+    return emptyNode;
+  }
+
+  struct PQNode root = pq->nodes[0];
+  pq->nodes[0] = pq->nodes[pq->size - 1];
+  pq->size--;
+  heapifyDown(pq, 0);
+
+  return root;
 }
 
 void printSolution(int dist[], int n, char *rooms[]) {
@@ -158,41 +133,44 @@ void dijkstra(struct Graph *graph, int src, char *rooms[]) {
   int V = graph->V;
   int dist[V];
 
-  struct MinHeap *minHeap = createMinHeap(V);
-
-  for (int v = 0; v < V; ++v) {
-    dist[v] = INT_MAX;
-    minHeap->array[v] = newMinHeapNode(v, dist[v]);
-    minHeap->pos[v] = v;
+  for (int i = 0; i < V; ++i) {
+    dist[i] = INT_MAX;
   }
 
-  minHeap->array[src] = newMinHeapNode(src, dist[src]);
-  minHeap->pos[src] = src;
+  struct PriorityQueue *pq = createPriorityQueue(V * V);
+
   dist[src] = 0;
-  decreaseKey(minHeap, src, dist[src]);
+  insert(pq, src, 0);
 
-  minHeap->size = V;
+  while (!isEmpty(pq)) {
+    struct PQNode currentNode = extractMin(pq);
+    int u = currentNode.vertex;
+    int d = currentNode.distance;
 
-  while (!isEmpty(minHeap)) {
-    struct MinHeapNode *minHeapNode = extractMin(minHeap);
-    int u = minHeapNode->v; // Store the extracted vertex number
+    // If we've found a shorter path already, skip this one
+    if (d > dist[u]) {
+      continue;
+    }
 
     struct AdjListNode *pCrawl = graph->array[u].head;
     while (pCrawl != NULL) {
       int v = pCrawl->dest;
+      int weight = pCrawl->weight;
 
-      if (isInMinHeap(minHeap, v) && dist[u] != INT_MAX &&
-          pCrawl->weight + dist[u] < dist[v]) {
-        dist[v] = dist[u] + pCrawl->weight;
-        decreaseKey(minHeap, v, dist[v]);
+      if (dist[u] != INT_MAX && dist[u] + weight < dist[v]) {
+        dist[v] = dist[u] + weight;
+        insert(pq, v, dist[v]);
       }
       pCrawl = pCrawl->next;
     }
   }
 
   printSolution(dist, V, rooms);
+  free(pq->nodes);
+  free(pq);
 }
 
+// --- Main Function ---
 int main() {
   int V = 5;
   char *rooms[] = {"Lobby", "Recording Room", "Control Room", "Vocal Booth",
@@ -209,6 +187,18 @@ int main() {
   addEdge(graph, 4, 0, 3); // Lounge -> Lobby (3 mins)
 
   dijkstra(graph, 0, rooms);
+
+  // Free graph memory
+  for (int i = 0; i < V; i++) {
+    struct AdjListNode *pCrawl = graph->array[i].head;
+    while (pCrawl != NULL) {
+      struct AdjListNode *temp = pCrawl;
+      pCrawl = pCrawl->next;
+      free(temp);
+    }
+  }
+  free(graph->array);
+  free(graph);
 
   return 0;
 }
