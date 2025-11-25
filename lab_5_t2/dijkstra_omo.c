@@ -1,97 +1,89 @@
-#include <limits.h>
 #include <stdio.h>
-#include <stdbool.h>
-#include <stdlib.h>
+#define V 9
+#define INF 9999
 
-#define V 5
-#define E 7
+// Returns the index of the node with minimum distance
+int minDistance(int dist[], int visited[]) {
+  // Initialize min value
+  int min = INF, min_index;
 
-typedef struct Node {
-    char name;
-    int distance_from_source;
-    bool is_visited;
-} Node;
-
-typedef struct Edge {
-    Node * source;
-    int weight;
-    Node * destination;
-} Edge;
-
-// Dijkstra's Algorithm to find the shortest path between a source vertex
-// and all other vertices
-void initialize_graph(Node * list_of_nodes[V], Edge * list_of_edges[E]) {
-    char names[V] = {'A','B','C','D','E'};
-    Node * a = (Node*) malloc(sizeof ( Node ));
-    Node * b = (Node*) malloc(sizeof ( Node ));
-    Node * c = (Node*) malloc(sizeof ( Node ));
-    Node * d = (Node*) malloc(sizeof ( Node ));
-    Node * e = (Node*) malloc(sizeof ( Node ));
-
-    list_of_nodes = {a,b,c,d,e};
-    for (int i = 0 ; i < V ; i++) {
-        list_of_nodes[i]->name = names[i];
-        list_of_nodes[i]->distance_from_source = INT_MAX;
-        list_of_nodes[i]->is_visited = false;
+  for (int v = 0; v < V; v++) {
+    // If node not visited and distance of node is less than the current minimum
+    if (!visited[v] && dist[v] <= min) {
+      // Minimum is updated
+      min = dist[v], min_index = v;
     }
+  };
 
-    Edge * e1 = (Edge*) malloc(sizeof(Edge));
-    Edge * e2 = (Edge*) malloc(sizeof(Edge));
-    Edge * e3 = (Edge*) malloc(sizeof(Edge));
-    Edge * e4 = (Edge*) malloc(sizeof(Edge));
-    Edge * e5 = (Edge*) malloc(sizeof(Edge));
-    Edge * e6 = (Edge*) malloc(sizeof(Edge));
-    Edge * e7 = (Edge*) malloc(sizeof(Edge));
-
-    e1->source = a;
-    e1->destination = b;
-    e1->weight = 19;
-
-    e2->source = a;
-    e2->weight = 7;
-    e2->destination = c;
-
-    e3->source = b;
-    e3->destination = c;
-    e3->weight = 11;
-
-    e4->source = b;
-    e4->destination = d;
-    e4->weight = 4; 
-
-    e5->source = c;
-    e5->destination = d;
-    e5->weight = 15;
-
-    e6->source = d;
-    e6->destination = e;
-    e6->weight = 13;
-
-    e7->source = c;
-    e7->destination = e;
-    e7->weight = 5;
-
-    for (int i = 0 ; i < E ; i++) {
-        list_of_edges[i] = e1;
-    }
+  return min_index;
 }
 
-// Entry point for the program
+// to print the constructed distance array
+void printSolution(int dist[], int n) {
+  printf("\nVertex Distance from Source\n");
+  for (int i = 0; i < V; i++) {
+    if (dist[i] != INF) {
+      printf("\t%d\t\t\t\t %d\n", i, dist[i]);
+    } else {
+      printf("\t%d\t\t\t\t INF\n", i);
+    }
+  }
+}
+
+// Function to implement Dijkstra's Algo
+void dijkstra(int graph[V][V], int src) {
+  // The output array. Dist[i] will hold the shortest distance
+  // from src to i
+  int dist[V];
+  int visited[V];
+
+  // Initialize all distances as INF and visited[] as false
+  for (int i = 0; i < V; i++) {
+    dist[i] = INF;
+    visited[i] = 0;
+  }
+
+  // Set the distance of src to src to 0 obviously
+  dist[src] = 0;
+
+  // Find the shortest path for all the vertices
+  for (int count = 0; count < V - 1; count++) {
+    // Pick the minimum distance vertex from the set of
+    // vertices not yet processed. u is always equal to src in the first
+    // iteration
+    int u = minDistance(dist, visited);
+
+    // Mark the picked vertex as visited
+    visited[u] = 1;
+
+    // Update the distance of adjacent vertices of the picked vertex
+    for (int v = 0; v < V; v++) {
+      // Update dist[v] only if it is not in visited[]
+      // There is an edge from u to v, and total
+      // weight of path from src to v through u is
+      // smaller than current value of dist[v]
+      if (!visited[v] && graph[u][v] && dist[u] != INF &&
+          dist[u] + graph[u][v] < dist[v]) {
+        // Update distance
+        dist[v] = dist[u] + graph[u][v];
+      }
+    }
+    // print the distance array:
+    printSolution(dist, V);
+  }
+}
+
 int main() {
-    Node* list_of_nodes[V];
-    Edge* list_of_edges[E];
+  int graph[V][V] = {
+      {0, 4, 0, 0, 0, 0, 0, 8, 0},  {4, 0, 8, 0, 0, 0, 0, 11, 0},
+      {0, 8, 0, 7, 0, 4, 0, 0, 2},  {0, 0, 7, 0, 9, 14, 0, 0, 0},
+      {0, 0, 0, 9, 0, 10, 0, 0, 0}, {0, 0, 4, 14, 10, 0, 2, 0, 0},
+      {0, 0, 0, 0, 0, 2, 0, 1, 6},  {8, 11, 0, 0, 0, 0, 1, 0, 7},
+      {0, 0, 2, 0, 0, 0, 6, 7, 0}};
 
-    initialize_graph(list_of_nodes,list_of_edges);
+  dijkstra(graph, 0);
+  // Time Complexity: O(V^2)
+  // Space Complexity: O(V)
 
-    if (list_of_nodes == NULL) {
-        printf("Bro nothing happened!");
-        return 0;
-    }
-
-    for (int i = 0 ; i < E ; i++) {
-        printf("%c -%d-> %c\n", list_of_edges[i]->source->name, list_of_edges[i]->weight, list_of_edges[i]->destination->name);
-    }
-
-    return 0;
+  return 0;
 }
-

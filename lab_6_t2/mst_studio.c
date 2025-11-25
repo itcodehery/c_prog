@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #define INF 999999
 
@@ -205,7 +204,7 @@ int main() {
   printf("1. Kruskal's Algorithm\n");
   printf("2. Prim's Algorithm\n");
   printf("Enter your choice: ");
-  scanf("%d", &choice);
+  scanf_s("%d", &choice);
 
   switch (choice) {
   case 1:
@@ -224,6 +223,4 @@ int main() {
   free(adjMatrix);
   free(graph->edge);
   free(graph);
-
   return 0;
-}
