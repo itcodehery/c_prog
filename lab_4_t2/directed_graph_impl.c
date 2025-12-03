@@ -339,7 +339,7 @@ int main() {
     printf("5. Exit\n");
     printf("========================================\n");
     printf("Enter your choice: ");
-    scanf("%d", &choice);
+    scanf_s("%d", &choice);
 
     switch (choice) {
     case 1:
