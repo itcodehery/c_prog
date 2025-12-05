@@ -224,3 +224,4 @@ int main() {
   free(graph->edge);
   free(graph);
   return 0;
+}
