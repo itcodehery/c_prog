@@ -26,9 +26,9 @@ int main() {
   char Y[100];
 
   printf("Enter first string: ");
-  scanf("%s", X);
+  scanf_s("%s", X);
   printf("Enter second string: ");
-  scanf("%s", Y);
+  scanf_s("%s", Y);
 
   if (strlen(X) == 0 || strlen(Y) == 0) {
     printf("Invalid or empty strings provided.\n");
